@@ -1,14 +1,18 @@
 import clsx from 'clsx';
 import { useState } from 'react';
+import { useUpdateItemMutation } from '../store';
 
 type ItemProps = {
-  itemId: string;
+  item: Item;
 };
 
-const Item = ({ itemId }: ItemProps) => {
+const Item = ({ item }: ItemProps) => {
   const [editing, setEditing] = useState(false);
-  const item = { id: '1', name: 'Unnamed', packed: false };
-
+  const [updateItem, result] = useUpdateItemMutation();
+  if (item.name === 'Sweatshirt') {
+    console.log({result})
+    console.log({ item })
+  }
   return (
     <li className="flex items-center gap-2">
       <input
@@ -16,7 +20,9 @@ const Item = ({ itemId }: ItemProps) => {
         className="focus:bg-red-500"
         checked={item.packed}
         id={`toggle-${item.id}`}
-        onChange={() => {}}
+        onChange={() => {
+          updateItem({ ...item, packed: !item.packed });
+        }}
       />
       <label
         htmlFor={`toggle-${item.id}`}
@@ -28,13 +34,17 @@ const Item = ({ itemId }: ItemProps) => {
         value={item.name}
         id={`edit-${item.id}`}
         className={clsx('py-0 text-sm', { hidden: !editing })}
-        onChange={() => {}}
+        onChange={(e) => {
+          updateItem({ ...item, name: e.currentTarget.value });
+        }}
       />
       <div className="flex gap-2">
         <button
           className="px-2 py-0 text-xs"
           aria-label={`Edit "${item.name}"`}
-          onClick={() => setEditing(!editing)}
+          onClick={() => {
+            setEditing(!editing);
+          }}
         >
           {editing ? '💾 Save' : '✍️ Edit'}
         </button>

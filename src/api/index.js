@@ -44,11 +44,33 @@ export function makeServer({ environment = 'development' }) {
       this.timing = 2000;
       this.namespace = 'api';
 
-      this.get('items');
-      this.get('items/:id');
-      this.put('items/:id');
-      this.patch('items/:id');
-      this.del('items/:id');
+      this.get('items', (schema, request) => {
+        return schema.items.all();
+      });
+      this.post('items', (schema, request) => {
+        const newItem = JSON.parse(request.requestBody);
+        return schema.notes.create(newItem);
+      });
+      this.get('items/:id', (schema, request) => {
+        const { id: itemId } = request.params;
+        return schema.items.find(itemId);
+      });
+      this.put('items/:id', (schema, request) => {
+        const newAttrs = JSON.parse(request.requestBody);
+        const { id: itemId } = request.params;
+        const item = schema.items.find(itemId);
+        return item.update(newAttrs);
+      });
+      this.patch('items/:id', (schema, request) => {
+        const newAttrs = JSON.parse(request.requestBody);
+        const { id: itemId } = request.params;
+        const item = schema.items.find(itemId);
+        return item.update(newAttrs);
+      });
+      this.del('items/:id', (schema, request) => {
+        const { id: itemId } = request.params;
+        return schema.items.find(itemId).destroy();
+      });
     },
 
     seeds(server) {
